@@ -35,6 +35,6 @@
     "web-ext": "^6.2.0"
   },
   "dependencies": {
-    "moment": "^2.29.1"
+    "date-fns": "^2.28.0"
   }
 }

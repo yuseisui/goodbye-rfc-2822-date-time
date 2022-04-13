@@ -1,5 +1,8 @@
-import moment from "moment";
+import format from "date-fns/format";
+import isValid from "date-fns/isValid";
+import parseISO from "date-fns/parseISO";
 import Site from "./Site";
+import { defaultLocale } from "./locale";
 
 // [Hot Questions - Stack Exchange](https://stackexchange.com/)
 export default class StackExchange extends Site {
@@ -12,9 +15,11 @@ export default class StackExchange extends Site {
         if (title == null) {
           return;
         }
-        const m = moment(title);
-        if (m.isValid()) {
-          relativeTime.innerText = m.format("LLLL");
+        const parsed = parseISO(title);
+        if (isValid(parsed)) {
+          relativeTime.innerText = format(parsed, "PPPpp", {
+            locale: defaultLocale,
+          });
         }
       }
     });
@@ -26,9 +31,11 @@ export default class StackExchange extends Site {
           if (t == null) {
             return;
           }
-          const m = moment(t);
-          if (m.isValid()) {
-            relativeTime.innerText = m.format("LLLL");
+          const parsed = parseISO(t);
+          if (isValid(parsed)) {
+            relativeTime.innerText = format(parsed, "PPPpp", {
+              locale: defaultLocale,
+            });
           }
         }
       }

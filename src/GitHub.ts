@@ -1,5 +1,7 @@
-import moment from "moment";
+import format from "date-fns/format";
+import parse from "date-fns/parse";
 import Site from "./Site";
+import { defaultLocale } from "./locale";
 
 // [GitHub](https://github.com/)
 export default class GitHub extends Site {
@@ -15,15 +17,15 @@ export default class GitHub extends Site {
       }
     });
     // コミット履歴の区切り
-    [...document.getElementsByClassName("commit-group-title")].forEach(
+    [...document.querySelectorAll(".TimelineItem-body > h2")].forEach(
       (commitGroupTitle) => {
         if (commitGroupTitle instanceof HTMLElement) {
           commitGroupTitle.innerText = commitGroupTitle.innerText.replace(
             /(Commits on )(\w+ \d+, \d+)/,
-            (_, p1: string, p2: string) =>
-              `${p1} + ${moment(p2, "MMMM DD, YYYY", "en")
-                .locale(window.navigator.language)
-                .format("LLLL")}`
+            (_, p1: string, p2: string) => {
+              const parsed = parse(p2, "MMM d, y", new Date());
+              return p1 + format(parsed, "PPP", { locale: defaultLocale });
+            }
           );
         }
       }
@@ -36,21 +38,20 @@ export default class GitHub extends Site {
         if (iconParent instanceof HTMLElement) {
           const milestoneMetaItem = iconParent.parentElement;
           if (milestoneMetaItem instanceof HTMLElement) {
-            const textNode =
-              milestoneMetaItem.childNodes[
-                milestoneMetaItem.childNodes.length - 1
-              ];
+            const textNode = milestoneMetaItem.lastChild;
             if (textNode instanceof Text) {
-              const text = textNode.wholeText.trim();
-              const parsed = moment(text, "[Due by] MMMM DD, YYYY", "en");
-              if (parsed.isValid()) {
-                milestoneMetaItem.replaceChild(
-                  document.createTextNode(
-                    parsed.locale(window.navigator.language).format("LL")
-                  ),
-                  textNode
+              const text = textNode.wholeText
+                .trimEnd()
+                .replace(
+                  /(\s*Due by )(\w+ \d+, \d+)/,
+                  (_, p1: string, p2: string) => {
+                    const parsed = parse(p2, "MMMM d, y", new Date());
+                    return (
+                      p1 + format(parsed, "PPP", { locale: defaultLocale })
+                    );
+                  }
                 );
-              }
+              textNode.replaceWith(document.createTextNode(text));
             }
           }
         }

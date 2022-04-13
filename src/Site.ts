@@ -1,15 +1,18 @@
-import moment from "moment";
+import format from "date-fns/format";
+import { defaultLocale } from "./locale";
 
 export default abstract class Site {
-  // // 変更を監視しているオブジェクト
+  // 変更を監視しているオブジェクト
   observers: MutationObserver[] = [];
 
-  // 生成されたらmomentの地域設定してコンソールに起動したログを残す.
+  // 生成されたらコンソールに起動したログを残す.
   constructor() {
-    // momentのグローバル地域設定.
-    moment.locale(window.navigator.language);
     // eslint-disable-next-line no-console
-    console.log(`goodbye-rfc-2822-date-time: ${moment().format("LLLL")}`);
+    console.log(
+      `goodbye-rfc-2822-date-time: ${format(Date.now(), "PPPppp", {
+        locale: defaultLocale,
+      })}`
+    );
   }
 
   // 初期化と書き換えの実行
